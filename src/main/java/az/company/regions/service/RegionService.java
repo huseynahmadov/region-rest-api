@@ -1,5 +1,7 @@
 package az.company.regions.service;
 
+import az.company.regions.exception.RegionAlreadyExistsException;
+import az.company.regions.exception.RegionNotFoundException;
 import az.company.regions.model.Region;
 import az.company.regions.repository.RegionRepository;
 import lombok.AllArgsConstructor;
@@ -7,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -24,6 +27,11 @@ public class RegionService {
     }
 
     public Region createRegion(Region newRegion) {
+
+        Optional<Region> regionByName = regionRepository.findByName(newRegion.getName());
+        if (regionByName.isPresent()) {
+            throw new RegionAlreadyExistsException("Region already exists with name:" + newRegion.getName());
+        }
         return regionRepository.save(newRegion);
     }
 
@@ -32,7 +40,8 @@ public class RegionService {
     }
 
     public Region getRegionById(String id) {
-        return regionRepository.findById(id).orElseThrow(() -> new RuntimeException("Error"));
+        return regionRepository.findById(id)
+                .orElseThrow(() -> new RegionNotFoundException("Region not found with id:" + id));
     }
 
     public void updateRegion(String id, Region newRegion) {

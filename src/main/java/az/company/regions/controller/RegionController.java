@@ -1,5 +1,7 @@
 package az.company.regions.controller;
 
+import az.company.regions.exception.RegionAlreadyExistsException;
+import az.company.regions.exception.RegionNotFoundException;
 import az.company.regions.model.Region;
 import az.company.regions.service.RegionService;
 import lombok.AllArgsConstructor;
@@ -49,4 +51,13 @@ public class RegionController {
         return regionService.getRegionById(id);
     }
 
+    @ExceptionHandler(RegionNotFoundException.class)
+    public ResponseEntity<String> handleRegionNotFoundException(RegionNotFoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(RegionAlreadyExistsException.class)
+    public ResponseEntity<String> handleRegionAlreadyExistsException(RegionAlreadyExistsException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
 }
